@@ -1,0 +1,121 @@
+/* @import 'tailwindcss'; */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.vue";
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Custom styles */
+.product-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.product-image {
+    height: 200px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.price-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 123, 255, 0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+/* Ensure proper styling for product cards */
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #dee2e6;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Custom pagination styling */
+.pagination .page-link {
+    color: #007bff;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    padding: 0.5rem 0.75rem;
+}
+
+/* Settings bar styles */
+.settings-bar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.settings-bar .form-select,
+.settings-bar .form-control {
+    border: 1px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.settings-bar .form-select:focus,
+.settings-bar .form-control:focus {
+    border-color: rgba(255,255,255,0.5);
+    box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.15);
+}
+
+.settings-bar .form-select option {
+    background: #495057;
+    color: white;
+}
+
+.settings-bar .text-muted {
+    color: rgba(255,255,255,0.8) !important;
+}
+
+.update-message {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+.update-message.success {
+    color: #d4edda;
+}
+
+.update-message.error {
+    color: #f8d7da;
+}

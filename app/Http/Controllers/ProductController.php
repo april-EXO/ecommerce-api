@@ -146,7 +146,7 @@ class ProductController extends Controller
             
             $products = $query->paginate(12);
             
-            return Response::paginated($products, 'Products retrieved successfully', [
+            return response()->paginated($products, 'Products retrieved successfully', [
                 'selected_country' => $selectedCountry,
                 'filters' => [
                     'search' => $request->get('search'),
@@ -161,7 +161,7 @@ class ProductController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            return Response::serverError('Failed to retrieve products: ' . $e->getMessage());
+            return response()->serverError('Failed to retrieve products: ' . $e->getMessage());
         }
     }
 
@@ -189,15 +189,15 @@ class ProductController extends Controller
                 ->find($id);
                 
             if (!$product) {
-                return Response::notFound('Product not found');
+                return response()->notFound('Product not found');
             }
             
-            return Response::success($product, 'Product retrieved successfully', [
+            return response()->success($product, 'Product retrieved successfully', [
                 'selected_country' => $selectedCountry
             ]);
             
         } catch (\Exception $e) {
-            return Response::serverError('Failed to retrieve product: ' . $e->getMessage());
+            return response()->serverError('Failed to retrieve product: ' . $e->getMessage());
         }
     }
 
@@ -246,7 +246,7 @@ class ProductController extends Controller
     public function getProductsByCountry($countryCode)
     {
         if (!in_array(strtoupper($countryCode), ['MY', 'SG'])) {
-            return Response::error('Invalid country code. Only MY and SG are supported.', null, 400);
+            return response()->error('Invalid country code. Only MY and SG are supported.');
         }
 
         $countryCode = strtoupper($countryCode);
@@ -259,6 +259,6 @@ class ProductController extends Controller
         }, 'category'])
         ->get();
 
-        return Response::success($products, "Products for {$countryCode} retrieved successfully");
+        return response()->success($products, "Products for {$countryCode} retrieved successfully");
     }
 }

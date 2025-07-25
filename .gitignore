@@ -21,11 +21,3 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
-
-# Frontend/Vue related files to exclude
-package.json
-package-lock.json
-vite.config.js
-resources/js/
-resources/css/app.css
-resources/views/welcome.blade.php
