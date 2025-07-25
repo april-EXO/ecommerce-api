@@ -10,6 +10,8 @@ import ProductDetail from './components/ProductDetail.vue';
 import SettingsBar from './components/SettingsBar.vue';
 import Auth from './components/Auth.vue';
 import Cart from './components/Cart.vue';
+import Orders from './components/Orders.vue';
+import OrderDetail from './components/OrderDetail.vue';
 
 // Import stores
 import { authStore } from './stores/auth.js';
@@ -65,6 +67,8 @@ const routes = [
     { path: '/product/:id', name: 'ProductDetail', component: ProductDetail, props: true },
     { path: '/auth', name: 'Auth', component: Auth },
     { path: '/cart', name: 'Cart', component: Cart },
+    { path: '/orders', name: 'Orders', component: Orders },
+    { path: '/orders/:id', name: 'OrderDetail', component: OrderDetail, props: true },
 ];
 
 const router = createRouter({
@@ -77,7 +81,10 @@ router.beforeEach((to, from, next) => {
     // Routes that don't require authentication
     const publicRoutes = ['ProductList', 'ProductDetail', 'Auth', 'Cart'];
     
-    if (!publicRoutes.includes(to.name) && !authStore.isAuthenticated) {
+    // Routes that require authentication
+    const protectedRoutes = ['Orders', 'OrderDetail'];
+    
+    if (protectedRoutes.includes(to.name) && !authStore.isAuthenticated) {
         // Redirect to auth page if trying to access protected route
         next({ name: 'Auth' });
     } else if (to.name === 'Auth' && authStore.isAuthenticated) {

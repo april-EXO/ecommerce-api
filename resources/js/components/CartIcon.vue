@@ -137,7 +137,7 @@ export default {
     },
 
     handleImageError(event) {
-      event.target.src = '/images/product-placeholder.jpg';
+      event.target.src = '/products/product-placeholder.png';
     }
   }
 };

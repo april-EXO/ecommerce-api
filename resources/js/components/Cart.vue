@@ -179,11 +179,17 @@
             <div class="mt-4">
               <button 
                 class="btn btn-primary btn-lg w-100 mb-2"
-                :disabled="!cartStore.cartItems.length"
+                :disabled="!cartStore.cartItems.length || checkingOut"
                 @click="proceedToCheckout"
               >
-                <i class="fas fa-credit-card me-1"></i>
-                Proceed to Checkout
+                <span v-if="checkingOut">
+                  <i class="fas fa-spinner fa-spin me-1"></i>
+                  Creating Order...
+                </span>
+                <span v-else>
+                  <i class="fas fa-credit-card me-1"></i>
+                  Proceed to Checkout
+                </span>
               </button>
               
               <button 
@@ -233,6 +239,7 @@ export default {
       cartStore,
       updating: null,
       clearing: false,
+      checkingOut: false,
       showToast: false,
       toastMessage: ''
     };
@@ -291,9 +298,44 @@ export default {
       }
     },
 
-    proceedToCheckout() {
-      // TODO: Implement checkout functionality
-      alert('Checkout functionality will be implemented next!');
+    async proceedToCheckout() {
+      if (!cartStore.cartItems.length) {
+        this.showError('Cart is empty');
+        return;
+      }
+
+      if (confirm('Proceed to checkout? This will create an order and clear your cart.')) {
+        this.checkingOut = true;
+        
+        try {
+          const response = await this.$http.post('/api/orders', {
+            country: this.$globalCountry?.getCurrentCountry() || 'MY'
+          });
+
+          if (response.data.success) {
+            this.showSuccess('Order created successfully! Order #' + response.data.data.order_number);
+            
+            // Clear local cart state since backend cleared the cart
+            cartStore.clearCart();
+            
+            // Redirect to orders page after delay
+            setTimeout(() => {
+              this.$router.push({ name: 'Orders' });
+            }, 2000);
+          } else {
+            this.showError(response.data.message || 'Failed to create order');
+          }
+        } catch (error) {
+          console.error('Checkout error:', error);
+          if (error.response?.status === 401) {
+            this.$router.push({ name: 'Auth' });
+          } else {
+            this.showError(error.response?.data?.message || 'Failed to create order');
+          }
+        } finally {
+          this.checkingOut = false;
+        }
+      }
     },
 
     getFormattedPrice(price) {
@@ -301,7 +343,7 @@ export default {
     },
 
     handleImageError(event) {
-      event.target.src = '/images/product-placeholder.jpg';
+      event.target.src = '/products/product-placeholder.png';
     },
 
     showSuccess(message) {
