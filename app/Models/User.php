@@ -57,10 +57,18 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's orders
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
      * Get or create user's cart
      */
-    public function getOrCreateCart($countryCode = 'MY')
+    public function getOrCreateCart()
     {
-        return Cart::getOrCreateCart($this->id, null, $countryCode);
+        return Cart::getOrCreateCart($this->id);
     }
 }

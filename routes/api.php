@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 
 // Authentication routes (public)
 Route::post('/register', [AuthController::class, 'register']);
@@ -21,12 +22,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Cart routes (require authentication)
 Route::middleware('auth:sanctum')->prefix('cart')->group(function () {
-    Route::get('/', [CartController::class, 'index']);                        // GET /api/cart
-    Route::get('/count', [CartController::class, 'count']);                   // GET /api/cart/count
-    Route::post('/items', [CartController::class, 'addItem']);                // POST /api/cart/items
-    Route::put('/items/{id}', [CartController::class, 'updateItem']);         // PUT /api/cart/items/{id}
-    Route::delete('/items/{id}', [CartController::class, 'removeItem']);      // DELETE /api/cart/items/{id}
-    Route::delete('/', [CartController::class, 'clear']);                     // DELETE /api/cart
+    Route::get('/', [CartController::class, 'index']);
+    Route::get('/count', [CartController::class, 'count']);
+    Route::post('/items', [CartController::class, 'addItem']);
+    Route::put('/items/{id}', [CartController::class, 'updateItem']);
+    Route::delete('/items/{id}', [CartController::class, 'removeItem']);
+    Route::delete('/', [CartController::class, 'clear']);
+});
+
+// Order routes (require authentication)
+Route::middleware('auth:sanctum')->prefix('orders')->group(function () {
+    Route::get('/', [OrderController::class, 'index']);
+    Route::get('/statuses', [OrderController::class, 'statuses']);
+    Route::get('/{id}', [OrderController::class, 'show']);
+    Route::post('/', [OrderController::class, 'store']);
+    Route::put('/{id}/cancel', [OrderController::class, 'cancel']);
+    Route::delete('/{id}', [OrderController::class, 'destroy']);
 });
 
 // Public routes (no authentication required)
@@ -41,6 +52,3 @@ Route::prefix('products')->group(function () {
     Route::get('/', [ProductController::class, 'index']);
     Route::get('/{id}', [ProductController::class, 'show']);
 });
-
-// Legacy route for backward compatibility
-Route::get('/countries/{countryCode}/products', [ProductController::class, 'getProductsByCountry']); 
