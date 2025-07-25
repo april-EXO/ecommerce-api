@@ -75,6 +75,18 @@
           </div>
         </div>
 
+        <!-- Orders Link -->
+        <div class="col-auto" v-if="authStore && authStore.isAuthenticated">
+          <router-link 
+            :to="{ name: 'Orders' }" 
+            class="btn btn-outline-light"
+            title="My Orders"
+          >
+            <i class="fas fa-receipt me-1"></i>
+            Orders
+          </router-link>
+        </div>
+
         <!-- Cart Icon -->
         <div class="col-auto">
           <CartIcon />
