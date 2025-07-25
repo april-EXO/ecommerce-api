@@ -83,12 +83,67 @@
               </div>
             </div>
 
+            <!-- Quantity Selector (only when item is NOT in cart) -->
+            <div class="mb-4" v-if="hasCurrentPrice && !isInCart">
+              <h5 class="text-muted">Quantity</h5>
+              <div class="d-flex align-items-center">
+                <button 
+                  @click="decreaseQuantity"
+                  class="btn btn-outline-secondary"
+                  :disabled="selectedQuantity <= 1"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span class="mx-3 fw-bold fs-5">{{ selectedQuantity }}</span>
+                <button 
+                  @click="increaseQuantity"
+                  class="btn btn-outline-secondary"
+                  :disabled="selectedQuantity >= 99"
+                >
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Already in Cart Notice -->
+            <div class="mb-4" v-if="isInCart">
+              <div class="alert alert-info d-flex align-items-center">
+                <i class="fas fa-info-circle me-2"></i>
+                <span>This item is already in your cart. Use the controls below to adjust quantity.</span>
+              </div>
+            </div>
+
+            <!-- Current Price Display -->
+            <div class="mb-4" v-if="currentPrice">
+              <div class="current-price-card p-3 border rounded bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h3 class="text-primary mb-1">{{ currentPrice.country.currency_code }} {{ parseFloat(currentPrice.price).toFixed(2) }}</h3>
+                    <small class="text-muted">Price in {{ currentPrice.country.name }}</small>
+                  </div>
+                  <div v-if="selectedQuantity > 1" class="text-end">
+                    <div class="text-muted">Total:</div>
+                    <h4 class="text-success mb-0">{{ currentPrice.country.currency_code }} {{ (parseFloat(currentPrice.price) * selectedQuantity).toFixed(2) }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Action Buttons -->
             <div class="d-grid gap-2">
-              <button class="btn btn-primary btn-lg" disabled>
-                <i class="fas fa-shopping-cart me-2"></i>
-                Add to Cart (Coming Soon)
-              </button>
+              <AddToCartButton 
+                v-if="product"
+                :product="productWithCurrentPrice"
+                :quantity="selectedQuantity"
+                :country="currentCountry"
+                :full-width="true"
+                :large="true"
+                @added-to-cart="handleAddedToCart"
+                @quantity-updated="handleQuantityUpdated"
+                @removed-from-cart="handleRemovedFromCart"
+                @error="handleCartError"
+              />
+              
               <button @click="goBack" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>
                 Back to Products
@@ -113,8 +168,14 @@
 </template>
 
 <script>
+import AddToCartButton from './AddToCartButton.vue';
+import { cartStore } from '../stores/cart.js';
+
 export default {
   name: 'ProductDetail',
+  components: {
+    AddToCartButton
+  },
   props: {
     id: {
       type: [String, Number],
@@ -126,7 +187,32 @@ export default {
       product: null,
       loading: false,
       error: null,
-      currentCountry: 'MY' // 缓存当前选择的国家
+      currentCountry: 'MY', // 缓存当前选择的国家
+      selectedQuantity: 1,
+      showSuccessMessage: false
+    }
+  },
+  computed: {
+    currentPrice() {
+      if (!this.product || !this.product.prices) return null;
+      return this.product.prices.find(price => price.country_code === this.currentCountry);
+    },
+    
+    hasCurrentPrice() {
+      return !!this.currentPrice;
+    },
+    
+    productWithCurrentPrice() {
+      if (!this.product) return null;
+      
+      return {
+        ...this.product,
+        current_price: this.currentPrice
+      };
+    },
+
+    isInCart() {
+      return this.product ? cartStore.isInCart(this.product.id) : false;
     }
   },
   async mounted() {
@@ -186,6 +272,53 @@ export default {
 
     goBack() {
       this.$router.push({ name: 'ProductList' });
+    },
+
+    // Quantity control methods
+    increaseQuantity() {
+      if (this.selectedQuantity < 99) {
+        this.selectedQuantity++;
+      }
+    },
+
+    decreaseQuantity() {
+      if (this.selectedQuantity > 1) {
+        this.selectedQuantity--;
+      }
+    },
+
+    // Cart event handlers
+    handleAddedToCart(data) {
+      this.showSuccess('Product added to cart!');
+      // Optionally reset quantity to 1 after adding
+      // this.selectedQuantity = 1;
+    },
+
+    handleQuantityUpdated(data) {
+      this.showSuccess('Cart updated!');
+    },
+
+    handleRemovedFromCart(data) {
+      this.showSuccess('Product removed from cart!');
+    },
+
+    handleCartError(error) {
+      this.showError(error);
+    },
+
+    showSuccess(message) {
+      // You can implement a toast notification here
+      console.log('Success:', message);
+      this.showSuccessMessage = true;
+      setTimeout(() => {
+        this.showSuccessMessage = false;
+      }, 3000);
+    },
+
+    showError(message) {
+      // You can implement error notification here
+      console.error('Cart Error:', message);
+      alert(message); // Simple alert for now
     }
   }
 }

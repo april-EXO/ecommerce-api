@@ -74,16 +74,30 @@
             </button>
           </div>
         </div>
+
+        <!-- Cart Icon -->
+        <div class="col-auto">
+          <CartIcon />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import CartIcon from './CartIcon.vue';
+
 export default {
   name: 'SettingsBar',
+  components: {
+    CartIcon
+  },
   props: {
     authStore: {
+      type: Object,
+      default: null
+    },
+    cartStore: {
       type: Object,
       default: null
     }

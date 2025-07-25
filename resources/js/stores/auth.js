@@ -116,6 +116,11 @@ export const authStore = reactive({
         
         localStorage.removeItem('auth_token');
         delete axios.defaults.headers.common['Authorization'];
+        
+        // Dispatch custom event for logout
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('auth-logout'));
+        }
     },
 
     // Update user's country preference

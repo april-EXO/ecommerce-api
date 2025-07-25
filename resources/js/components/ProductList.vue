@@ -198,9 +198,23 @@
                 <span class="text-muted">Price not available</span>
               </div>
               
+              <!-- Add to Cart Button -->
+              <div class="mb-2">
+                <AddToCartButton 
+                  :product="getProductWithCurrentPrice(product)"
+                  :quantity="1"
+                  :country="currentCountry"
+                  :full-width="true"
+                  @added-to-cart="handleAddedToCart"
+                  @quantity-updated="handleQuantityUpdated"
+                  @removed-from-cart="handleRemovedFromCart"
+                  @error="handleCartError"
+                />
+              </div>
+              
               <router-link 
                 :to="{ name: 'ProductDetail', params: { id: product.id } }" 
-                class="btn btn-primary w-100"
+                class="btn btn-outline-primary w-100"
               >
                 View Details
               </router-link>
@@ -261,8 +275,13 @@
 </template>
 
 <script>
+import AddToCartButton from './AddToCartButton.vue';
+
 export default {
   name: 'ProductList',
+  components: {
+    AddToCartButton
+  },
   data() {
     return {
       products: [],
@@ -488,6 +507,47 @@ export default {
     formatPrice(price) {
       const currency = this.currentCountry === 'SG' ? 'SGD' : 'MYR';
       return `${currency} ${parseFloat(price).toFixed(2)}`;
+    },
+
+    // Get product with current price for cart
+    getProductWithCurrentPrice(product) {
+      if (!product || !product.prices) return product;
+      
+      const currentPrice = product.prices.find(price => price.country_code === this.currentCountry);
+      
+      return {
+        ...product,
+        current_price: currentPrice
+      };
+    },
+
+    // Cart event handlers
+    handleAddedToCart(data) {
+      this.showSuccess(`${data.product.name} added to cart!`);
+    },
+
+    handleQuantityUpdated(data) {
+      this.showSuccess('Cart updated!');
+    },
+
+    handleRemovedFromCart(data) {
+      this.showSuccess(`${data.product.name} removed from cart!`);
+    },
+
+    handleCartError(error) {
+      this.showError(error);
+    },
+
+    showSuccess(message) {
+      // You can implement a toast notification here
+      console.log('Success:', message);
+      // Simple alert for now - you can replace with a proper toast system
+      // alert(message);
+    },
+
+    showError(message) {
+      console.error('Cart Error:', message);
+      alert(message);
     }
   }
 }
