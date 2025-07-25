@@ -9,9 +9,13 @@ import ProductList from './components/ProductList.vue';
 import ProductDetail from './components/ProductDetail.vue';
 import SettingsBar from './components/SettingsBar.vue';
 import Auth from './components/Auth.vue';
+import Cart from './components/Cart.vue';
+import Orders from './components/Orders.vue';
+import OrderDetail from './components/OrderDetail.vue';
 
 // Import stores
 import { authStore } from './stores/auth.js';
+import { cartStore } from './stores/cart.js';
 
 // Configure axios
 axios.defaults.baseURL = 'http://127.0.0.1:8000';
@@ -62,6 +66,9 @@ const routes = [
     { path: '/', name: 'ProductList', component: ProductList },
     { path: '/product/:id', name: 'ProductDetail', component: ProductDetail, props: true },
     { path: '/auth', name: 'Auth', component: Auth },
+    { path: '/cart', name: 'Cart', component: Cart },
+    { path: '/orders', name: 'Orders', component: Orders },
+    { path: '/orders/:id', name: 'OrderDetail', component: OrderDetail, props: true },
 ];
 
 const router = createRouter({
@@ -72,9 +79,12 @@ const router = createRouter({
 // Router guards for authentication
 router.beforeEach((to, from, next) => {
     // Routes that don't require authentication
-    const publicRoutes = ['ProductList', 'ProductDetail', 'Auth'];
+    const publicRoutes = ['ProductList', 'ProductDetail', 'Auth', 'Cart'];
     
-    if (!publicRoutes.includes(to.name) && !authStore.isAuthenticated) {
+    // Routes that require authentication
+    const protectedRoutes = ['Orders', 'OrderDetail'];
+    
+    if (protectedRoutes.includes(to.name) && !authStore.isAuthenticated) {
         // Redirect to auth page if trying to access protected route
         next({ name: 'Auth' });
     } else if (to.name === 'Auth' && authStore.isAuthenticated) {
@@ -111,21 +121,36 @@ const app = createApp({
     data() {
         return {
             currentCountry: globalCountryState.currentCountry,
-            authStore
+            authStore,
+            cartStore
         };
     },
     async mounted() {
         // Initialize auth store
         await authStore.init();
         
+        // Initialize cart store with current country
+        await cartStore.init(this.currentCountry);
+        
         // 监听国家变化
-        emitter.on('country-changed', (newCountry) => {
+        emitter.on('country-changed', async (newCountry) => {
             this.currentCountry = newCountry;
+            // Update cart store when country changes
+            await cartStore.updateCountry(newCountry);
         });
 
         // 监听认证成功事件
-        emitter.on('auth-success', (user) => {
+        emitter.on('auth-success', async (user) => {
             console.log('User authenticated:', user);
+            // When user logs in, fetch their cart
+            await cartStore.fetchCart();
+        });
+
+        // 监听登出事件
+        window.addEventListener('auth-logout', () => {
+            console.log('User logged out');
+            // Clear cart when user logs out
+            cartStore.clearCart();
         });
     },
     methods: {
@@ -141,6 +166,7 @@ const app = createApp({
             <SettingsBar 
                 @country-changed="handleCountryChange"
                 :auth-store="authStore"
+                :cart-store="cartStore"
             />
             <router-view></router-view>
         </div>
@@ -152,6 +178,7 @@ app.config.globalProperties.$http = axios;
 app.config.globalProperties.$emitter = emitter;
 app.config.globalProperties.$globalCountry = globalCountryState;
 app.config.globalProperties.$authStore = authStore;
+app.config.globalProperties.$cartStore = cartStore;
 
 app.use(router);
 app.mount('#app');

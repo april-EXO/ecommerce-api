@@ -74,16 +74,42 @@
             </button>
           </div>
         </div>
+
+        <!-- Orders Link -->
+        <div class="col-auto" v-if="authStore && authStore.isAuthenticated">
+          <router-link 
+            :to="{ name: 'Orders' }" 
+            class="btn btn-outline-light"
+            title="My Orders"
+          >
+            <i class="fas fa-receipt me-1"></i>
+            Orders
+          </router-link>
+        </div>
+
+        <!-- Cart Icon -->
+        <div class="col-auto">
+          <CartIcon />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import CartIcon from './CartIcon.vue';
+
 export default {
   name: 'SettingsBar',
+  components: {
+    CartIcon
+  },
   props: {
     authStore: {
+      type: Object,
+      default: null
+    },
+    cartStore: {
       type: Object,
       default: null
     }
