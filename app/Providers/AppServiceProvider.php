@@ -3,9 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Http\Response as HttpResponse;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,103 +20,84 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Schema::defaultStringLength(191);
-
-        Response::macro('success', function ($data = null, $message = 'Success', $status = HttpResponse::HTTP_OK) {
-            return response()->json([
+        // Response Macros for API responses
+        Response::macro('success', function ($data = null, $message = 'Success', $meta = [], $status = 200) {
+            $response = [
                 'success' => true,
                 'message' => $message,
-                'data' => $data
-            ], $status);
-        });
-
-        Response::macro('error', function ($message = 'Error', $errors = null, $status = HttpResponse::HTTP_BAD_REQUEST) {
-            $response = [
-                'success' => false,
-                'message' => $message
             ];
 
-            if ($errors) {
-                $response['errors'] = $errors;
+            if ($data !== null) {
+                $response['data'] = $data;
             }
 
-            return response()->json($response, $status);
+            if (!empty($meta)) {
+                $response['meta'] = $meta;
+            }
+
+            return Response::json($response, $status);
         });
 
-        Response::macro('notFound', function ($message = 'Resource not found') {
-            return response()->json([
+        Response::macro('error', function ($message = 'Error', $data = null, $status = 400) {
+            $response = [
                 'success' => false,
-                'message' => $message
-            ], HttpResponse::HTTP_NOT_FOUND);
+                'message' => $message,
+            ];
+
+            if ($data !== null) {
+                $response['data'] = $data;
+            }
+
+            return Response::json($response, $status);
         });
 
-        Response::macro('unauthorized', function ($message = 'Unauthorized') {
-            return response()->json([
-                'success' => false,
-                'message' => $message
-            ], HttpResponse::HTTP_UNAUTHORIZED);
+        Response::macro('notFound', function ($message = 'Resource not found', $data = null) {
+            return Response::error($message, $data, 404);
         });
 
-        Response::macro('forbidden', function ($message = 'Forbidden') {
-            return response()->json([
-                'success' => false,
-                'message' => $message
-            ], HttpResponse::HTTP_FORBIDDEN);
+        Response::macro('serverError', function ($message = 'Internal server error', $data = null) {
+            return Response::error($message, $data, 500);
         });
 
-        Response::macro('validationError', function ($errors, $message = 'Validation failed') {
-            return response()->json([
+        Response::macro('unauthorized', function ($message = 'Unauthorized', $data = null) {
+            return Response::error($message, $data, 401);
+        });
+
+        Response::macro('forbidden', function ($message = 'Forbidden', $data = null) {
+            return Response::error($message, $data, 403);
+        });
+
+        Response::macro('validationError', function ($message = 'Validation failed', $errors = []) {
+            return Response::json([
                 'success' => false,
                 'message' => $message,
                 'errors' => $errors
-            ], HttpResponse::HTTP_UNPROCESSABLE_ENTITY);
+            ], 422);
         });
 
-        Response::macro('serverError', function ($message = 'Internal server error') {
-            return response()->json([
-                'success' => false,
-                'message' => $message
-            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
-        });
-
-        Response::macro('paginated', function ($data, $message = 'Success') {
-            return response()->json([
+        Response::macro('paginated', function ($paginator, $message = 'Data retrieved successfully', $meta = []) {
+            $response = [
                 'success' => true,
                 'message' => $message,
-                'data' => $data->items(),
+                'data' => $paginator->items(),
                 'pagination' => [
-                    'current_page' => $data->currentPage(),
-                    'last_page' => $data->lastPage(),
-                    'per_page' => $data->perPage(),
-                    'total' => $data->total(),
-                    'from' => $data->firstItem(),
-                    'to' => $data->lastItem(),
-                    'has_more_pages' => $data->hasMorePages()
-                ]
-            ]);
-        });
+                    'current_page' => $paginator->currentPage(),
+                    'last_page' => $paginator->lastPage(),
+                    'per_page' => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                    'from' => $paginator->firstItem(),
+                    'to' => $paginator->lastItem(),
+                    'path' => $paginator->path(),
+                    'next_page_url' => $paginator->nextPageUrl(),
+                    'prev_page_url' => $paginator->previousPageUrl(),
+                ],
+            ];
 
-        Response::macro('created', function ($data = null, $message = 'Resource created successfully') {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => $data
-            ], HttpResponse::HTTP_CREATED);
-        });
+            if (!empty($meta)) {
+                $response['meta'] = $meta;
+            }
 
-        Response::macro('updated', function ($data = null, $message = 'Resource updated successfully') {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => $data
-            ], HttpResponse::HTTP_OK);
-        });
-
-        Response::macro('deleted', function ($message = 'Resource deleted successfully') {
-            return response()->json([
-                'success' => true,
-                'message' => $message
-            ], HttpResponse::HTTP_OK);
+            return Response::json($response);
         });
     }
 }

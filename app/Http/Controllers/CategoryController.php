@@ -46,7 +46,7 @@ class CategoryController extends Controller
     {
         $categories = Category::withCount('products')->get();
         
-        return Response::success($categories, 'Categories retrieved successfully');
+        return response()->success($categories, 'Categories retrieved successfully');
     }
 
     /**
@@ -90,9 +90,9 @@ class CategoryController extends Controller
         $category = Category::with('products')->find($id);
         
         if (!$category) {
-            return Response::notFound('Category not found');
+            return response()->notFound('Category not found');
         }
         
-        return Response::success($category, 'Category retrieved successfully');
+        return response()->success($category, 'Category retrieved successfully');
     }
 }
