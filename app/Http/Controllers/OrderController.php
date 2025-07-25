@@ -321,42 +321,4 @@ class OrderController extends Controller
             return response()->json(['success' => false, 'message' => 'Failed to delete order: ' . $e->getMessage()], 500);
         }
     }
-
-    /**
-     * Restore a soft deleted order
-     */
-    public function restore(Request $request, $id)
-    {
-        try {
-            $user = $request->user();
-            if (!$user) {
-                return response()->json(['success' => false, 'message' => 'Login required'], 401);
-            }
-
-            $order = Order::where('user_id', $user->id)
-                ->where('id', $id)
-                ->onlyTrashed()
-                ->first();
-
-            if (!$order) {
-                return response()->json(['success' => false, 'message' => 'Deleted order not found'], 404);
-            }
-
-            $order->restore();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Order restored successfully',
-                'data' => [
-                    'id' => $order->id,
-                    'order_number' => $order->order_number,
-                    'status' => $order->status,
-                    'status_label' => Order::getStatuses()[$order->status]
-                ]
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Failed to restore order: ' . $e->getMessage()], 500);
-        }
-    }
 }
