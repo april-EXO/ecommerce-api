@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'country_code',
+        'is_admin',
     ];
 
     /**
@@ -45,6 +46,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 
@@ -70,5 +72,13 @@ class User extends Authenticatable
     public function getOrCreateCart()
     {
         return Cart::getOrCreateCart($this->id);
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin(): bool
+    {
+        return $this->is_admin === true;
     }
 }
