@@ -157,7 +157,11 @@ class OrderController extends Controller
     {
         try {
             $request->validate([
-                'country' => 'required|string|in:MY,SG'
+                'country' => 'required|string|in:MY,SG',
+                'shipping_address' => 'required|array',
+                'shipping_address.name' => 'required|string|max:255',
+                'shipping_address.phone' => 'required|string|max:20',
+                'shipping_address.address' => 'required|string|max:1000',
             ]);
 
             $user = $request->user();
@@ -188,7 +192,8 @@ class OrderController extends Controller
             }
 
             // Create order from cart
-            $order = Order::createFromCart($cart, $countryCode);
+            $shippingAddress = $request->shipping_address;
+            $order = Order::createFromCart($cart, $countryCode, $shippingAddress);
 
             // Clear the cart after successful order creation
             $cart->cartItems()->delete();

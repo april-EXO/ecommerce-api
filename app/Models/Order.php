@@ -15,12 +15,14 @@ class Order extends Model
         'country_code',
         'total_price',
         'status',
-        'order_number'
+        'order_number',
+        'shipping_address'
     ];
 
     protected $casts = [
         'user_id' => 'integer',
         'total_price' => 'decimal:2',
+        'shipping_address' => 'array',
     ];
 
     // Order status constants
@@ -109,7 +111,7 @@ class Order extends Model
     /**
      * Create order from cart
      */
-    public static function createFromCart(Cart $cart, $countryCode)
+    public static function createFromCart(Cart $cart, $countryCode, $shippingAddress = null)
     {
         // Calculate total price for the country
         $totalPrice = $cart->cartItems->sum(function ($item) use ($countryCode) {
@@ -122,7 +124,8 @@ class Order extends Model
             'country_code' => $countryCode,
             'total_price' => $totalPrice,
             'status' => self::STATUS_PENDING,
-            'order_number' => self::generateOrderNumber()
+            'order_number' => self::generateOrderNumber(),
+            'shipping_address' => $shippingAddress
         ]);
 
         // Create order items from cart items
