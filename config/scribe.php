@@ -95,7 +95,7 @@ return [
     // How is your API authenticated? This information will be used in the displayed docs, generated examples and response calls.
     'auth' => [
         // Set this to true if ANY endpoints in your API use authentication.
-        'enabled' => true,
+        'enabled' => false,
 
         // Set this to true if your API should be authenticated by default. If so, you must also set `enabled` (above) to true.
         // You can then use @unauthenticated or @authenticated on individual endpoints to change their status from the default.
@@ -210,13 +210,11 @@ return [
             ...Defaults::METADATA_STRATEGIES,
         ],
         'headers' => [
-            
+            ...Defaults::HEADERS_STRATEGIES,
             Strategies\StaticData::withSettings(data: [
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-                'Accept-Language' => 'en / zh',
             ]),
-            ...Defaults::HEADERS_STRATEGIES,
         ],
         'urlParameters' => [
             ...Defaults::URL_PARAMETERS_STRATEGIES,

@@ -7,10 +7,62 @@ use App\Models\Order;
 use App\Models\Cart;
 use App\Models\User;
 
+/**
+ * @group Orders
+ * 
+ * API endpoints for managing customer orders
+ */
 class OrderController extends Controller
 {
     /**
      * Get user's orders list
+     * 
+     * Retrieve a paginated list of orders for the authenticated user with filtering options.
+     * 
+     * @authenticated
+     * 
+     * @queryParam per_page integer Number of orders per page. Default: 10. Example: 15
+     * @queryParam status string Filter orders by status. Options: pending, processing, shipped, delivered, cancelled, refunded. Example: pending
+     * @queryParam include_deleted boolean Include soft-deleted orders. Default: false. Example: true
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Orders retrieved successfully",
+     *   "data": [
+     *     {
+     *       "id": 1,
+     *       "order_number": "ORD-20240115-0001",
+     *       "status": "pending",
+     *       "status_label": "Pending",
+     *       "status_display": "Pending",
+     *       "total_price": 105.00,
+     *       "formatted_total_price": "RM 105.00",
+     *       "total_quantity": 3,
+     *       "country_code": "MY",
+     *       "country_name": "Malaysia",
+     *       "created_at": "2024-01-15T10:00:00.000000Z",
+     *       "updated_at": "2024-01-15T10:00:00.000000Z",
+     *       "deleted_at": null,
+     *       "can_be_cancelled": true,
+     *       "can_be_deleted": false,
+     *       "is_deleted": false,
+     *       "order_items_count": 2
+     *     }
+     *   ],
+     *   "pagination": {
+     *     "current_page": 1,
+     *     "last_page": 1,
+     *     "per_page": 10,
+     *     "total": 1,
+     *     "from": 1,
+     *     "to": 1
+     *   }
+     * }
+     * 
+     * @response 401 {
+     *   "success": false,
+     *   "message": "Login required"
+     * }
      */
     public function index(Request $request)
     {
@@ -82,6 +134,64 @@ class OrderController extends Controller
 
     /**
      * Get specific order details
+     * 
+     * Retrieve detailed information about a specific order including all order items.
+     * 
+     * @authenticated
+     * 
+     * @urlParam id integer required The ID of the order. Example: 1
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Order retrieved successfully",
+     *   "data": {
+     *     "id": 1,
+     *     "order_number": "ORD-20240115-0001",
+     *     "status": "pending",
+     *     "status_label": "Pending",
+     *     "status_display": "Pending",
+     *     "total_price": 105.00,
+     *     "formatted_total_price": "RM 105.00",
+     *     "total_quantity": 3,
+     *     "country_code": "MY",
+     *     "country_name": "Malaysia",
+     *     "created_at": "2024-01-15T10:00:00.000000Z",
+     *     "updated_at": "2024-01-15T10:00:00.000000Z",
+     *     "deleted_at": null,
+     *     "can_be_cancelled": true,
+     *     "can_be_deleted": false,
+     *     "is_completed": false,
+     *     "is_cancelled": false,
+     *     "is_deleted": false,
+     *     "order_items": [
+     *       {
+     *         "id": 1,
+     *         "product_id": 1,
+     *         "product_name": "Ethiopian Light Roast",
+     *         "unit_price": 35.00,
+     *         "formatted_unit_price": "RM 35.00",
+     *         "quantity": 2,
+     *         "subtotal": 70.00,
+     *         "formatted_subtotal": "RM 70.00",
+     *         "currency_code": "MYR",
+     *         "product": {
+     *           "id": 1,
+     *           "name": "Ethiopian Light Roast",
+     *           "image_full_url": "http://localhost/storage/products/ethiopian-light.jpg",
+     *           "category": {
+     *             "id": 1,
+     *             "name": "Coffee Beans"
+     *           }
+     *         }
+     *       }
+     *     ]
+     *   }
+     * }
+     * 
+     * @response 404 {
+     *   "success": false,
+     *   "message": "Order not found"
+     * }
      */
     public function show(Request $request, $id)
     {
@@ -152,6 +262,44 @@ class OrderController extends Controller
 
     /**
      * Create order from cart (checkout)
+     * 
+     * Create a new order from the user's current shopping cart.
+     * 
+     * @authenticated
+     * 
+     * @bodyParam country string required The country code for pricing (MY or SG). Example: MY
+     * @bodyParam shipping_address object required The shipping address details.
+     * @bodyParam shipping_address.name string required Recipient's name. Example: John Doe
+     * @bodyParam shipping_address.phone string required Recipient's phone number. Example: +60123456789
+     * @bodyParam shipping_address.address string required Full shipping address. Example: 123 Main Street, Kuala Lumpur 50000, Malaysia
+     * 
+     * @response 201 {
+     *   "success": true,
+     *   "message": "Order created successfully",
+     *   "data": {
+     *     "id": 1,
+     *     "order_number": "ORD-20240115-0001",
+     *     "status": "pending",
+     *     "status_label": "Pending",
+     *     "total_price": 105.00,
+     *     "formatted_total_price": "RM 105.00",
+     *     "total_quantity": 3,
+     *     "country_code": "MY",
+     *     "created_at": "2024-01-15T10:00:00.000000Z"
+     *   }
+     * }
+     * 
+     * @response 400 {
+     *   "success": false,
+     *   "message": "Cart is empty"
+     * }
+     * 
+     * @response 422 {
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *     "country": ["The country field is required."]
+     *   }
+     * }
      */
     public function store(Request $request)
     {
@@ -224,6 +372,33 @@ class OrderController extends Controller
 
     /**
      * Cancel an order
+     * 
+     * Cancel a pending or processing order.
+     * 
+     * @authenticated
+     * 
+     * @urlParam id integer required The ID of the order to cancel. Example: 1
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Order cancelled successfully",
+     *   "data": {
+     *     "id": 1,
+     *     "order_number": "ORD-20240115-0001",
+     *     "status": "cancelled",
+     *     "status_label": "Cancelled"
+     *   }
+     * }
+     * 
+     * @response 400 {
+     *   "success": false,
+     *   "message": "Order cannot be cancelled"
+     * }
+     * 
+     * @response 404 {
+     *   "success": false,
+     *   "message": "Order not found"
+     * }
      */
     public function cancel(Request $request, $id)
     {
@@ -266,6 +441,21 @@ class OrderController extends Controller
 
     /**
      * Get order statuses (for dropdowns, etc.)
+     * 
+     * Retrieve all available order statuses for filtering and display purposes.
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Order statuses retrieved successfully",
+     *   "data": {
+     *     "pending": "Pending",
+     *     "processing": "Processing",
+     *     "shipped": "Shipped",
+     *     "delivered": "Delivered",
+     *     "cancelled": "Cancelled",
+     *     "refunded": "Refunded"
+     *   }
+     * }
      */
     public function statuses()
     {
@@ -278,6 +468,32 @@ class OrderController extends Controller
 
     /**
      * Soft delete an order
+     * 
+     * Delete an order (only cancelled or refunded orders can be deleted).
+     * 
+     * @authenticated
+     * 
+     * @urlParam id integer required The ID of the order to delete. Example: 1
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Order deleted successfully",
+     *   "data": {
+     *     "id": 1,
+     *     "order_number": "ORD-20240115-0001",
+     *     "deleted_at": "2024-01-15T11:00:00.000000Z"
+     *   }
+     * }
+     * 
+     * @response 422 {
+     *   "success": false,
+     *   "message": "Only cancelled or refunded orders can be deleted"
+     * }
+     * 
+     * @response 404 {
+     *   "success": false,
+     *   "message": "Order not found"
+     * }
      */
     public function destroy(Request $request, $id)
     {

@@ -1,119 +1,41 @@
-name: Products
+name: 'Shopping Cart'
 description: |-
 
-  API endpoints for managing products
+  API endpoints for managing shopping cart operations
 endpoints:
   -
     httpMethods:
       - GET
-    uri: api/products
+    uri: api/cart
     metadata:
-      groupName: Products
+      groupName: 'Shopping Cart'
       groupDescription: |-
 
-        API endpoints for managing products
+        API endpoints for managing shopping cart operations
       subgroup: ''
       subgroupDescription: ''
-      title: 'Get products list'
-      description: 'Retrieve a paginated list of products with advanced filtering and sorting options.'
-      authenticated: false
+      title: 'Get cart contents'
+      description: "Retrieve the current user's shopping cart with all items and pricing for the specified country."
+      authenticated: true
       custom: []
     headers:
       Content-Type: application/json
       Accept: application/json
-      Accept-Language: 'en / zh'
     urlParameters: []
     cleanUrlParameters: []
     queryParameters:
       country:
         name: country
-        description: 'Optional country code (MY or SG) to filter products by pricing availability.'
+        description: 'The country code for pricing (MY or SG). Default: MY.'
         required: false
-        example: MY
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      per_page:
-        name: per_page
-        description: 'Number of products per page. Default: 15.'
-        required: false
-        example: 10
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      category_id:
-        name: category_id
-        description: 'Optional category ID to filter products by category.'
-        required: false
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      price_from:
-        name: price_from
-        description: 'decimal Optional minimum price filter (in selected country currency).'
-        required: false
-        example: 10
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      price_to:
-        name: price_to
-        description: 'decimal Optional maximum price filter (in selected country currency).'
-        required: false
-        example: 50
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      search:
-        name: search
-        description: 'Optional search term to filter products by name or description.'
-        required: false
-        example: Ethiopian
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      sort_by:
-        name: sort_by
-        description: 'Optional sorting field. Options: name, price. Default: name.'
-        required: false
-        example: price
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-      sort_order:
-        name: sort_order
-        description: 'Optional sorting order. Options: asc, desc. Default: asc.'
-        required: false
-        example: desc
+        example: SG
         type: string
         enumValues: []
         exampleWasSpecified: true
         nullable: false
         custom: []
     cleanQueryParameters:
-      country: MY
-      per_page: 10
-      category_id: 1
-      price_from: 10
-      price_to: 50
-      search: Ethiopian
-      sort_by: price
-      sort_order: desc
+      country: SG
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -123,57 +45,45 @@ endpoints:
         content: |-
           {
             "success": true,
-            "message": "Products retrieved successfully",
-            "data": [
-              {
-                "id": 1,
-                "name": "Ethiopian Light Roast",
-                "description": "Bright and fruity single-origin beans.",
-                "image_url": "ethiopian-light.jpg",
-                "category_id": 1,
-                "created_at": "2024-01-15T10:00:00.000000Z",
-                "updated_at": "2024-01-15T10:00:00.000000Z",
-                "image_full_url": "http://localhost/storage/products/ethiopian-light.jpg",
-                "category": {
+            "message": "Cart retrieved successfully",
+            "data": {
+              "id": 1,
+              "country_code": "MY",
+              "total_quantity": 3,
+              "total_price": 105.00,
+              "cart_items": [
+                {
                   "id": 1,
-                  "name": "Coffee Beans",
-                  "description": "Premium coffee beans from around the world"
-                },
-                "prices": [
-                  {
+                  "quantity": 2,
+                  "total_price": 70.00,
+                  "formatted_total_price": "RM 70.00",
+                  "product": {
                     "id": 1,
-                    "product_id": 1,
-                    "country_code": "MY",
-                    "price": "35.00",
-                    "country": {
-                      "code": "MY",
-                      "name": "Malaysia",
+                    "name": "Ethiopian Light Roast",
+                    "description": "Bright and fruity single-origin beans.",
+                    "image_full_url": "http://localhost/storage/products/ethiopian-light.jpg",
+                    "category": {
+                      "id": 1,
+                      "name": "Coffee Beans"
+                    },
+                    "current_price": {
+                      "price": "35.00",
                       "currency_code": "MYR"
                     }
                   }
-                ]
-              }
-            ],
-            "pagination": {
-              "current_page": 1,
-              "last_page": 1,
-              "per_page": 15,
-              "total": 3
-            },
-            "meta": {
-              "filtered_country": "MY",
-              "country_source": "session",
-              "filters": {
-                "category_id": 1,
-                "price_from": 10.00,
-                "price_to": 50.00,
-                "search": "Ethiopian"
-              },
-              "sorting": {
-                "sort_by": "price",
-                "sort_order": "asc"
-              }
+                }
+              ]
             }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Login required"
           }
         headers: []
         description: ''
@@ -187,101 +97,23 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/products/{id}'
+    uri: api/cart/count
     metadata:
-      groupName: Products
-      groupDescription: ''
-      subgroup: ''
-      subgroupDescription: ''
-      title: 'Get a specific product'
-      description: ''
-      authenticated: false
-      custom: []
-    headers:
-      Content-Type: application/json
-      Accept: application/json
-      Accept-Language: 'en / zh'
-    urlParameters:
-      id:
-        name: id
-        description: 'The product ID'
-        required: true
-        example: 16
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        custom: []
-    cleanUrlParameters:
-      id: 16
-    queryParameters:
-      country:
-        name: country
-        description: 'The country code (MY, SG).'
-        required: false
-        example: MY
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-    cleanQueryParameters:
-      country: MY
-    bodyParameters: []
-    cleanBodyParameters: []
-    fileParameters: []
-    responses:
-      -
-        status: 500
-        content: |-
-          {
-              "message": "Server Error"
-          }
-        headers:
-          cache-control: 'no-cache, private'
-          content-type: application/json
-          access-control-allow-origin: '*'
-          set-cookie: 'laravel_session=RUPTTnkKxeCmLM0gqjPly1rIXR3BkLfQUTddPwuH; expires=Thu, 24 Jul 2025 12:59:48 GMT; Max-Age=7200; path=/; httponly; samesite=lax'
-        description: null
-        custom: []
-    responseFields: []
-    auth: []
-    controller: null
-    method: null
-    route: null
-    custom: []
-  -
-    httpMethods:
-      - GET
-    uri: 'api/countries/{countryCode}/products'
-    metadata:
-      groupName: Products
+      groupName: 'Shopping Cart'
       groupDescription: |-
 
-        API endpoints for managing products
+        API endpoints for managing shopping cart operations
       subgroup: ''
       subgroupDescription: ''
-      title: 'Get products by country'
-      description: 'Retrieve products available in a specific country.'
-      authenticated: false
+      title: 'Get cart count (for header display)'
+      description: "Get the total number of items in the user's cart for display purposes."
+      authenticated: true
       custom: []
     headers:
       Content-Type: application/json
       Accept: application/json
-      Accept-Language: 'en / zh'
-    urlParameters:
-      countryCode:
-        name: countryCode
-        description: 'The country code (MY or SG).'
-        required: true
-        example: SG
-        type: string
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-    cleanUrlParameters:
-      countryCode: SG
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -293,37 +125,352 @@ endpoints:
         content: |-
           {
             "success": true,
-            "message": "Products for SG retrieved successfully",
-            "data": [
-              {
+            "message": "Cart count retrieved successfully",
+            "data": {
+              "count": 3
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/cart/items
+    metadata:
+      groupName: 'Shopping Cart'
+      groupDescription: |-
+
+        API endpoints for managing shopping cart operations
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Add item to cart'
+      description: 'Add a product to the shopping cart or update quantity if item already exists.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      product_id:
+        name: product_id
+        description: 'The ID of the product to add.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      quantity:
+        name: quantity
+        description: 'The quantity to add (1-99). Default: 1.'
+        required: false
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      country:
+        name: country
+        description: 'The country code for pricing validation (MY or SG). Default: MY.'
+        required: false
+        example: SG
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      product_id: 1
+      quantity: 2
+      country: SG
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Item added to cart successfully",
+            "data": {
+              "cart_item": {
                 "id": 1,
-                "name": "Ethiopian Light Roast",
-                "description": "Bright and fruity single-origin beans.",
-                "image_url": "ethiopian-light.jpg",
-                "category_id": 1,
-                "created_at": "2024-01-15T10:00:00.000000Z",
-                "updated_at": "2024-01-15T10:00:00.000000Z",
-                "image_full_url": "http://localhost/storage/products/ethiopian-light.jpg",
-                "category": {
-                  "id": 1,
-                  "name": "Coffee Beans",
-                  "description": "Premium coffee beans from around the world"
-                },
-                "prices": [
-                  {
-                    "id": 2,
-                    "product_id": 1,
-                    "country_code": "SG",
-                    "price": "15.00",
-                    "country": {
-                      "code": "SG",
-                      "name": "Singapore",
-                      "currency_code": "SGD"
-                    }
-                  }
-                ]
+                "quantity": 2,
+                "product_id": 1
+              },
+              "cart_summary": {
+                "total_quantity": 3,
+                "total_price": 105.00
               }
-            ]
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+            "success": false,
+            "message": "Product not available in SG"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "The given data was invalid.",
+            "errors": {
+              "product_id": ["The selected product id is invalid."]
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+    uri: 'api/cart/items/{id}'
+    metadata:
+      groupName: 'Shopping Cart'
+      groupDescription: |-
+
+        API endpoints for managing shopping cart operations
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update cart item quantity'
+      description: 'Update the quantity of a specific cart item.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the item.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      itemId:
+        name: itemId
+        description: 'The ID of the cart item to update.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: architecto
+      itemId: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      quantity:
+        name: quantity
+        description: 'The new quantity (1-99).'
+        required: true
+        example: 3
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      quantity: 3
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Cart item updated successfully",
+            "data": {
+              "cart_item": {
+                "id": 1,
+                "quantity": 3,
+                "total_price": 105.00
+              },
+              "cart_summary": {
+                "total_quantity": 5,
+                "total_price": 175.00
+              }
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "success": false,
+            "message": "Cart item not found"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/cart/items/{id}'
+    metadata:
+      groupName: 'Shopping Cart'
+      groupDescription: |-
+
+        API endpoints for managing shopping cart operations
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Remove item from cart'
+      description: 'Remove a specific item from the shopping cart.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the item.'
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      itemId:
+        name: itemId
+        description: 'The ID of the cart item to remove.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: architecto
+      itemId: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Item removed from cart successfully",
+            "data": {
+              "cart_summary": {
+                "total_quantity": 2,
+                "total_price": 70.00
+              }
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "success": false,
+            "message": "Cart item not found"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: api/cart
+    metadata:
+      groupName: 'Shopping Cart'
+      groupDescription: |-
+
+        API endpoints for managing shopping cart operations
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Clear cart'
+      description: 'Remove all items from the shopping cart.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Cart cleared successfully",
+            "data": {
+              "cart_summary": {
+                "total_quantity": 0,
+                "total_price": 0
+              }
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "success": false,
+            "message": "Cart not found"
           }
         headers: []
         description: ''

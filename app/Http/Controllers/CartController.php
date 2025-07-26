@@ -7,10 +7,59 @@ use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
+/**
+ * @group Shopping Cart
+ * 
+ * API endpoints for managing shopping cart operations
+ */
 class CartController extends Controller
 {
     /**
      * Get cart contents
+     * 
+     * Retrieve the current user's shopping cart with all items and pricing for the specified country.
+     * 
+     * @authenticated
+     * 
+     * @queryParam country string The country code for pricing (MY or SG). Default: MY. Example: SG
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Cart retrieved successfully",
+     *   "data": {
+     *     "id": 1,
+     *     "country_code": "MY",
+     *     "total_quantity": 3,
+     *     "total_price": 105.00,
+     *     "cart_items": [
+     *       {
+     *         "id": 1,
+     *         "quantity": 2,
+     *         "total_price": 70.00,
+     *         "formatted_total_price": "RM 70.00",
+     *         "product": {
+     *           "id": 1,
+     *           "name": "Ethiopian Light Roast",
+     *           "description": "Bright and fruity single-origin beans.",
+     *           "image_full_url": "http://localhost/storage/products/ethiopian-light.jpg",
+     *           "category": {
+     *             "id": 1,
+     *             "name": "Coffee Beans"
+     *           },
+     *           "current_price": {
+     *             "price": "35.00",
+     *             "currency_code": "MYR"
+     *           }
+     *         }
+     *       }
+     *     ]
+     *   }
+     * }
+     * 
+     * @response 401 {
+     *   "success": false,
+     *   "message": "Login required"
+     * }
      */
     public function index(Request $request)
     {
@@ -66,6 +115,42 @@ class CartController extends Controller
 
     /**
      * Add item to cart
+     * 
+     * Add a product to the shopping cart or update quantity if item already exists.
+     * 
+     * @authenticated
+     * 
+     * @bodyParam product_id integer required The ID of the product to add. Example: 1
+     * @bodyParam quantity integer The quantity to add (1-99). Default: 1. Example: 2
+     * @bodyParam country string The country code for pricing validation (MY or SG). Default: MY. Example: SG
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Item added to cart successfully",
+     *   "data": {
+     *     "cart_item": {
+     *       "id": 1,
+     *       "quantity": 2,
+     *       "product_id": 1
+     *     },
+     *     "cart_summary": {
+     *       "total_quantity": 3,
+     *       "total_price": 105.00
+     *     }
+     *   }
+     * }
+     * 
+     * @response 400 {
+     *   "success": false,
+     *   "message": "Product not available in SG"
+     * }
+     * 
+     * @response 422 {
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *     "product_id": ["The selected product id is invalid."]
+     *   }
+     * }
      */
     public function addItem(Request $request)
     {
@@ -127,6 +212,34 @@ class CartController extends Controller
 
     /**
      * Update cart item quantity
+     * 
+     * Update the quantity of a specific cart item.
+     * 
+     * @authenticated
+     * 
+     * @urlParam itemId integer required The ID of the cart item to update. Example: 1
+     * @bodyParam quantity integer required The new quantity (1-99). Example: 3
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Cart item updated successfully",
+     *   "data": {
+     *     "cart_item": {
+     *       "id": 1,
+     *       "quantity": 3,
+     *       "total_price": 105.00
+     *     },
+     *     "cart_summary": {
+     *       "total_quantity": 5,
+     *       "total_price": 175.00
+     *     }
+     *   }
+     * }
+     * 
+     * @response 404 {
+     *   "success": false,
+     *   "message": "Cart item not found"
+     * }
      */
     public function updateItem(Request $request, $itemId)
     {
@@ -165,6 +278,28 @@ class CartController extends Controller
 
     /**
      * Remove item from cart
+     * 
+     * Remove a specific item from the shopping cart.
+     * 
+     * @authenticated
+     * 
+     * @urlParam itemId integer required The ID of the cart item to remove. Example: 1
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Item removed from cart successfully",
+     *   "data": {
+     *     "cart_summary": {
+     *       "total_quantity": 2,
+     *       "total_price": 70.00
+     *     }
+     *   }
+     * }
+     * 
+     * @response 404 {
+     *   "success": false,
+     *   "message": "Cart item not found"
+     * }
      */
     public function removeItem(Request $request, $itemId)
     {
@@ -194,6 +329,26 @@ class CartController extends Controller
 
     /**
      * Clear cart
+     * 
+     * Remove all items from the shopping cart.
+     * 
+     * @authenticated
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Cart cleared successfully",
+     *   "data": {
+     *     "cart_summary": {
+     *       "total_quantity": 0,
+     *       "total_price": 0
+     *     }
+     *   }
+     * }
+     * 
+     * @response 404 {
+     *   "success": false,
+     *   "message": "Cart not found"
+     * }
      */
     public function clear(Request $request)
     {
@@ -219,6 +374,18 @@ class CartController extends Controller
 
     /**
      * Get cart count (for header display)
+     * 
+     * Get the total number of items in the user's cart for display purposes.
+     * 
+     * @authenticated
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Cart count retrieved successfully",
+     *   "data": {
+     *     "count": 3
+     *   }
+     * }
      */
     public function count(Request $request)
     {
