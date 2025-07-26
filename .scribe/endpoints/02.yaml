@@ -1,0 +1,561 @@
+name: Orders
+description: |-
+
+  API endpoints for managing customer orders
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/orders
+    metadata:
+      groupName: Orders
+      groupDescription: |-
+
+        API endpoints for managing customer orders
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Get user's orders list"
+      description: 'Retrieve a paginated list of orders for the authenticated user with filtering options.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters:
+      per_page:
+        name: per_page
+        description: 'Number of orders per page. Default: 10.'
+        required: false
+        example: 15
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      status:
+        name: status
+        description: 'Filter orders by status. Options: pending, processing, shipped, delivered, cancelled, refunded.'
+        required: false
+        example: pending
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      include_deleted:
+        name: include_deleted
+        description: 'Include soft-deleted orders. Default: false.'
+        required: false
+        example: true
+        type: boolean
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      per_page: 15
+      status: pending
+      include_deleted: true
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Orders retrieved successfully",
+            "data": [
+              {
+                "id": 1,
+                "order_number": "ORD-20240115-0001",
+                "status": "pending",
+                "status_label": "Pending",
+                "status_display": "Pending",
+                "total_price": 105.00,
+                "formatted_total_price": "RM 105.00",
+                "total_quantity": 3,
+                "country_code": "MY",
+                "country_name": "Malaysia",
+                "created_at": "2024-01-15T10:00:00.000000Z",
+                "updated_at": "2024-01-15T10:00:00.000000Z",
+                "deleted_at": null,
+                "can_be_cancelled": true,
+                "can_be_deleted": false,
+                "is_deleted": false,
+                "order_items_count": 2
+              }
+            ],
+            "pagination": {
+              "current_page": 1,
+              "last_page": 1,
+              "per_page": 10,
+              "total": 1,
+              "from": 1,
+              "to": 1
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "success": false,
+            "message": "Login required"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: api/orders/statuses
+    metadata:
+      groupName: Orders
+      groupDescription: |-
+
+        API endpoints for managing customer orders
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get order statuses (for dropdowns, etc.)'
+      description: 'Retrieve all available order statuses for filtering and display purposes.'
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Order statuses retrieved successfully",
+            "data": {
+              "pending": "Pending",
+              "processing": "Processing",
+              "shipped": "Shipped",
+              "delivered": "Delivered",
+              "cancelled": "Cancelled",
+              "refunded": "Refunded"
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/orders/{id}'
+    metadata:
+      groupName: Orders
+      groupDescription: |-
+
+        API endpoints for managing customer orders
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get specific order details'
+      description: 'Retrieve detailed information about a specific order including all order items.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the order.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Order retrieved successfully",
+            "data": {
+              "id": 1,
+              "order_number": "ORD-20240115-0001",
+              "status": "pending",
+              "status_label": "Pending",
+              "status_display": "Pending",
+              "total_price": 105.00,
+              "formatted_total_price": "RM 105.00",
+              "total_quantity": 3,
+              "country_code": "MY",
+              "country_name": "Malaysia",
+              "created_at": "2024-01-15T10:00:00.000000Z",
+              "updated_at": "2024-01-15T10:00:00.000000Z",
+              "deleted_at": null,
+              "can_be_cancelled": true,
+              "can_be_deleted": false,
+              "is_completed": false,
+              "is_cancelled": false,
+              "is_deleted": false,
+              "order_items": [
+                {
+                  "id": 1,
+                  "product_id": 1,
+                  "product_name": "Ethiopian Light Roast",
+                  "unit_price": 35.00,
+                  "formatted_unit_price": "RM 35.00",
+                  "quantity": 2,
+                  "subtotal": 70.00,
+                  "formatted_subtotal": "RM 70.00",
+                  "currency_code": "MYR",
+                  "product": {
+                    "id": 1,
+                    "name": "Ethiopian Light Roast",
+                    "image_full_url": "http://localhost/storage/products/ethiopian-light.jpg",
+                    "category": {
+                      "id": 1,
+                      "name": "Coffee Beans"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "success": false,
+            "message": "Order not found"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/orders
+    metadata:
+      groupName: Orders
+      groupDescription: |-
+
+        API endpoints for managing customer orders
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Create order from cart (checkout)'
+      description: "Create a new order from the user's current shopping cart."
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      country:
+        name: country
+        description: 'The country code for pricing (MY or SG).'
+        required: true
+        example: MY
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      shipping_address:
+        name: shipping_address
+        description: 'The shipping address details.'
+        required: true
+        example: []
+        type: object
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      shipping_address.name:
+        name: shipping_address.name
+        description: "Recipient's name."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      shipping_address.phone:
+        name: shipping_address.phone
+        description: "Recipient's phone number."
+        required: true
+        example: '+60123456789'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      shipping_address.address:
+        name: shipping_address.address
+        description: 'Full shipping address.'
+        required: true
+        example: '123 Main Street, Kuala Lumpur 50000, Malaysia'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      country: MY
+      shipping_address:
+        name: 'John Doe'
+        phone: '+60123456789'
+        address: '123 Main Street, Kuala Lumpur 50000, Malaysia'
+    fileParameters: []
+    responses:
+      -
+        status: 201
+        content: |-
+          {
+            "success": true,
+            "message": "Order created successfully",
+            "data": {
+              "id": 1,
+              "order_number": "ORD-20240115-0001",
+              "status": "pending",
+              "status_label": "Pending",
+              "total_price": 105.00,
+              "formatted_total_price": "RM 105.00",
+              "total_quantity": 3,
+              "country_code": "MY",
+              "created_at": "2024-01-15T10:00:00.000000Z"
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+            "success": false,
+            "message": "Cart is empty"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "The given data was invalid.",
+            "errors": {
+              "country": ["The country field is required."]
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+    uri: 'api/orders/{id}/cancel'
+    metadata:
+      groupName: Orders
+      groupDescription: |-
+
+        API endpoints for managing customer orders
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Cancel an order'
+      description: 'Cancel a pending or processing order.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the order to cancel.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Order cancelled successfully",
+            "data": {
+              "id": 1,
+              "order_number": "ORD-20240115-0001",
+              "status": "cancelled",
+              "status_label": "Cancelled"
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 400
+        content: |-
+          {
+            "success": false,
+            "message": "Order cannot be cancelled"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "success": false,
+            "message": "Order not found"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - DELETE
+    uri: 'api/orders/{id}'
+    metadata:
+      groupName: Orders
+      groupDescription: |-
+
+        API endpoints for managing customer orders
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Soft delete an order'
+      description: 'Delete an order (only cancelled or refunded orders can be deleted).'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the order to delete.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Order deleted successfully",
+            "data": {
+              "id": 1,
+              "order_number": "ORD-20240115-0001",
+              "deleted_at": "2024-01-15T11:00:00.000000Z"
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "success": false,
+            "message": "Order not found"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "success": false,
+            "message": "Only cancelled or refunded orders can be deleted"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

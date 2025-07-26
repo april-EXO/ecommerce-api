@@ -1,59 +1,201 @@
-name: Categories
+name: Authentication
 description: |-
 
-  API endpoints for managing product categories
+  API endpoints for user authentication management
 endpoints:
   -
     httpMethods:
-      - GET
-    uri: api/categories
+      - POST
+    uri: api/register
     metadata:
-      groupName: Categories
+      groupName: Authentication
       groupDescription: |-
 
-        API endpoints for managing product categories
+        API endpoints for user authentication management
       subgroup: ''
       subgroupDescription: ''
-      title: 'Get all categories'
-      description: 'Retrieve a list of all available product categories.'
+      title: 'Register a new user'
+      description: 'Create a new user account with email verification.'
       authenticated: false
       custom: []
     headers:
       Content-Type: application/json
       Accept: application/json
-      Accept-Language: 'en / zh'
     urlParameters: []
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
-    bodyParameters: []
-    cleanBodyParameters: []
+    bodyParameters:
+      name:
+        name: name
+        description: "The user's full name."
+        required: true
+        example: 'John Doe'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      email:
+        name: email
+        description: "The user's email address."
+        required: true
+        example: john@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: "The user's password (min 8 characters)."
+        required: true
+        example: password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      country_code:
+        name: country_code
+        description: "optional The user's country code (MY or SG)."
+        required: false
+        example: MY
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: true
+        custom: []
+      password_confirmation:
+        name: password_confirmation
+        description: 'Password confirmation.'
+        required: true
+        example: password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      name: 'John Doe'
+      email: john@example.com
+      password: password123
+      country_code: MY
+      password_confirmation: password123
+    fileParameters: []
+    responses:
+      -
+        status: 201
+        content: |-
+          {
+            "message": "User registered successfully",
+            "user": {
+              "id": 1,
+              "name": "John Doe",
+              "email": "john@example.com",
+              "country_code": "MY",
+              "created_at": "2024-01-15T10:00:00.000000Z",
+              "updated_at": "2024-01-15T10:00:00.000000Z"
+            },
+            "access_token": "1|abcdef123456...",
+            "token_type": "Bearer"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "The given data was invalid.",
+            "errors": {
+              "email": ["The email has already been taken."]
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/login
+    metadata:
+      groupName: Authentication
+      groupDescription: |-
+
+        API endpoints for user authentication management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Login user'
+      description: 'Authenticate user and return access token.'
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      email:
+        name: email
+        description: "The user's email address."
+        required: true
+        example: john@example.com
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      password:
+        name: password
+        description: "The user's password."
+        required: true
+        example: password123
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      email: john@example.com
+      password: password123
     fileParameters: []
     responses:
       -
         status: 200
         content: |-
           {
-            "success": true,
-            "message": "Categories retrieved successfully",
-            "data": [
-              {
-                "id": 1,
-                "name": "Coffee Beans",
-                "description": "Premium coffee beans from around the world",
-                "created_at": "2024-01-15T10:00:00.000000Z",
-                "updated_at": "2024-01-15T10:00:00.000000Z",
-                "products_count": 5
-              },
-              {
-                "id": 2,
-                "name": "Ready-to-Drink",
-                "description": "Cold brew, iced coffee, and ready-to-drink beverages",
-                "created_at": "2024-01-15T10:00:00.000000Z",
-                "updated_at": "2024-01-15T10:00:00.000000Z",
-                "products_count": 4
-              }
-            ]
+            "message": "Login successful",
+            "user": {
+              "id": 1,
+              "name": "John Doe",
+              "email": "john@example.com",
+              "country_code": "MY",
+              "created_at": "2024-01-15T10:00:00.000000Z",
+              "updated_at": "2024-01-15T10:00:00.000000Z"
+            },
+            "access_token": "1|abcdef123456...",
+            "token_type": "Bearer"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "The given data was invalid.",
+            "errors": {
+              "email": ["The provided credentials are incorrect."]
+            }
           }
         headers: []
         description: ''
@@ -67,35 +209,23 @@ endpoints:
   -
     httpMethods:
       - GET
-    uri: 'api/categories/{id}'
+    uri: api/user
     metadata:
-      groupName: Categories
+      groupName: Authentication
       groupDescription: |-
 
-        API endpoints for managing product categories
+        API endpoints for user authentication management
       subgroup: ''
       subgroupDescription: ''
-      title: 'Get single category'
-      description: 'Retrieve details of a specific category with its products.'
-      authenticated: false
+      title: 'Get authenticated user'
+      description: 'Retrieve the currently authenticated user information.'
+      authenticated: true
       custom: []
     headers:
       Content-Type: application/json
       Accept: application/json
-      Accept-Language: 'en / zh'
-    urlParameters:
-      id:
-        name: id
-        description: 'The ID of the category.'
-        required: true
-        example: 1
-        type: integer
-        enumValues: []
-        exampleWasSpecified: true
-        nullable: false
-        custom: []
-    cleanUrlParameters:
-      id: 1
+    urlParameters: []
+    cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -106,37 +236,200 @@ endpoints:
         status: 200
         content: |-
           {
-            "success": true,
-            "message": "Category retrieved successfully",
-            "data": {
+            "user": {
               "id": 1,
-              "name": "Coffee Beans",
-              "description": "Premium coffee beans from around the world",
+              "name": "John Doe",
+              "email": "john@example.com",
+              "country_code": "MY",
+              "is_admin": false,
               "created_at": "2024-01-15T10:00:00.000000Z",
-              "updated_at": "2024-01-15T10:00:00.000000Z",
-              "products": [
-                {
-                  "id": 1,
-                  "name": "Ethiopian Light Roast",
-                  "description": "Bright and fruity single-origin beans.",
-                  "image_url": "Ethiopian Light Roast.jpg",
-                  "category_id": 1,
-                  "created_at": "2024-01-15T10:00:00.000000Z",
-                  "updated_at": "2024-01-15T10:00:00.000000Z",
-                  "image_full_url": "http://localhost/storage/products/Ethiopian Light Roast.jpg"
-                }
-              ]
+              "updated_at": "2024-01-15T10:00:00.000000Z"
             }
           }
         headers: []
         description: ''
         custom: []
       -
-        status: 404
+        status: 401
         content: |-
           {
-            "success": false,
-            "message": "Category not found"
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/logout
+    metadata:
+      groupName: Authentication
+      groupDescription: |-
+
+        API endpoints for user authentication management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Logout user (Revoke current token)'
+      description: 'Logout the user from current device by revoking the current access token.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "message": "Logged out successfully"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - POST
+    uri: api/logout-all
+    metadata:
+      groupName: Authentication
+      groupDescription: |-
+
+        API endpoints for user authentication management
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Logout from all devices (Revoke all tokens)'
+      description: 'Logout the user from all devices by revoking all access tokens.'
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "message": "Logged out from all devices successfully"
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 401
+        content: |-
+          {
+            "message": "Unauthenticated."
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+    uri: api/user/country
+    metadata:
+      groupName: Authentication
+      groupDescription: |-
+
+        API endpoints for user authentication management
+      subgroup: ''
+      subgroupDescription: ''
+      title: "Update user's country preference"
+      description: "Update the authenticated user's country preference for pricing and currency."
+      authenticated: true
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      country_code:
+        name: country_code
+        description: 'The country code (MY or SG).'
+        required: true
+        example: SG
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanBodyParameters:
+      country_code: SG
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Country preference updated successfully",
+            "data": {
+              "user": {
+                "id": 1,
+                "name": "John Doe",
+                "email": "john@example.com",
+                "country_code": "SG",
+                "created_at": "2024-01-15T10:00:00.000000Z",
+                "updated_at": "2024-01-15T10:00:00.000000Z"
+              },
+              "country_code": "SG"
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 422
+        content: |-
+          {
+            "message": "The given data was invalid.",
+            "errors": {
+              "country_code": ["The selected country code is invalid."]
+            }
           }
         headers: []
         description: ''

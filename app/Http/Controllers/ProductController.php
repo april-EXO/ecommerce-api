@@ -167,9 +167,52 @@ class ProductController extends Controller
 
     /**
      * Get a specific product
-     * @group Products
-     * @urlParam id integer required The product ID
-     * @queryParam country string The country code (MY, SG). Example: MY
+     * 
+     * Retrieve detailed information about a specific product with pricing for the specified country.
+     * 
+     * @urlParam id integer required The product ID. Example: 1
+     * @queryParam country string The country code for pricing (MY or SG). Default: MY. Example: SG
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Product retrieved successfully",
+     *   "data": {
+     *     "id": 1,
+     *     "name": "Ethiopian Light Roast",
+     *     "description": "Bright and fruity single-origin beans.",
+     *     "image_url": "ethiopian-light.jpg",
+     *     "category_id": 1,
+     *     "created_at": "2024-01-15T10:00:00.000000Z",
+     *     "updated_at": "2024-01-15T10:00:00.000000Z",
+     *     "image_full_url": "http://localhost/storage/products/ethiopian-light.jpg",
+     *     "category": {
+     *       "id": 1,
+     *       "name": "Coffee Beans",
+     *       "description": "Premium coffee beans from around the world"
+     *     },
+     *     "prices": [
+     *       {
+     *         "id": 2,
+     *         "product_id": 1,
+     *         "country_code": "SG",
+     *         "price": "15.00",
+     *         "country": {
+     *           "code": "SG",
+     *           "name": "Singapore",
+     *           "currency_code": "SGD"
+     *         }
+     *       }
+     *     ]
+     *   },
+     *   "meta": {
+     *     "selected_country": "SG"
+     *   }
+     * }
+     * 
+     * @response 404 {
+     *   "success": false,
+     *   "message": "Product not found"
+     * }
      */
     public function show($id, Request $request)
     {
@@ -199,66 +242,5 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->serverError('Failed to retrieve product: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Get products by country
-     * 
-     * Retrieve products available in a specific country.
-     * 
-     * @urlParam countryCode string required The country code (MY or SG). Example: SG
-     * 
-     * @response 200 {
-     *   "success": true,
-     *   "message": "Products for SG retrieved successfully",
-     *   "data": [
-     *     {
-     *       "id": 1,
-     *       "name": "Ethiopian Light Roast",
-     *       "description": "Bright and fruity single-origin beans.",
-     *       "image_url": "ethiopian-light.jpg",
-     *       "category_id": 1,
-     *       "created_at": "2024-01-15T10:00:00.000000Z",
-     *       "updated_at": "2024-01-15T10:00:00.000000Z",
-     *       "image_full_url": "http://localhost/storage/products/ethiopian-light.jpg",
-     *       "category": {
-     *         "id": 1,
-     *         "name": "Coffee Beans",
-     *         "description": "Premium coffee beans from around the world"
-     *       },
-     *       "prices": [
-     *         {
-     *           "id": 2,
-     *           "product_id": 1,
-     *           "country_code": "SG",
-     *           "price": "15.00",
-     *           "country": {
-     *             "code": "SG",
-     *             "name": "Singapore",
-     *             "currency_code": "SGD"
-     *           }
-     *         }
-     *       ]
-     *     }
-     *   ]
-     * }
-     */
-    public function getProductsByCountry($countryCode)
-    {
-        if (!in_array(strtoupper($countryCode), ['MY', 'SG'])) {
-            return response()->error('Invalid country code. Only MY and SG are supported.');
-        }
-
-        $countryCode = strtoupper($countryCode);
-
-        $products = Product::whereHas('prices', function($query) use ($countryCode) {
-            $query->where('country_code', $countryCode);
-        })
-        ->with(['prices' => function($query) use ($countryCode) {
-            $query->where('country_code', $countryCode)->with('country');
-        }, 'category'])
-        ->get();
-
-        return response()->success($products, "Products for {$countryCode} retrieved successfully");
     }
 }

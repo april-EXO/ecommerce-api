@@ -1,0 +1,147 @@
+name: Categories
+description: |-
+
+  API endpoints for managing product categories
+endpoints:
+  -
+    httpMethods:
+      - GET
+    uri: api/categories
+    metadata:
+      groupName: Categories
+      groupDescription: |-
+
+        API endpoints for managing product categories
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get all categories'
+      description: 'Retrieve a list of all available product categories.'
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Categories retrieved successfully",
+            "data": [
+              {
+                "id": 1,
+                "name": "Coffee Beans",
+                "description": "Premium coffee beans from around the world",
+                "created_at": "2024-01-15T10:00:00.000000Z",
+                "updated_at": "2024-01-15T10:00:00.000000Z",
+                "products_count": 5
+              },
+              {
+                "id": 2,
+                "name": "Ready-to-Drink",
+                "description": "Cold brew, iced coffee, and ready-to-drink beverages",
+                "created_at": "2024-01-15T10:00:00.000000Z",
+                "updated_at": "2024-01-15T10:00:00.000000Z",
+                "products_count": 4
+              }
+            ]
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - GET
+    uri: 'api/categories/{id}'
+    metadata:
+      groupName: Categories
+      groupDescription: |-
+
+        API endpoints for managing product categories
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get single category'
+      description: 'Retrieve details of a specific category with its products.'
+      authenticated: false
+      custom: []
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the category.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        status: 200
+        content: |-
+          {
+            "success": true,
+            "message": "Category retrieved successfully",
+            "data": {
+              "id": 1,
+              "name": "Coffee Beans",
+              "description": "Premium coffee beans from around the world",
+              "created_at": "2024-01-15T10:00:00.000000Z",
+              "updated_at": "2024-01-15T10:00:00.000000Z",
+              "products": [
+                {
+                  "id": 1,
+                  "name": "Ethiopian Light Roast",
+                  "description": "Bright and fruity single-origin beans.",
+                  "image_url": "Ethiopian Light Roast.jpg",
+                  "category_id": 1,
+                  "created_at": "2024-01-15T10:00:00.000000Z",
+                  "updated_at": "2024-01-15T10:00:00.000000Z",
+                  "image_full_url": "http://localhost/storage/products/Ethiopian Light Roast.jpg"
+                }
+              ]
+            }
+          }
+        headers: []
+        description: ''
+        custom: []
+      -
+        status: 404
+        content: |-
+          {
+            "success": false,
+            "message": "Category not found"
+          }
+        headers: []
+        description: ''
+        custom: []
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+    custom: []

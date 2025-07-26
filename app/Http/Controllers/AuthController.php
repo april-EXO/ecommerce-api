@@ -9,10 +9,44 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
 
+/**
+ * @group Authentication
+ * 
+ * API endpoints for user authentication management
+ */
 class AuthController extends Controller
 {
     /**
      * Register a new user
+     * 
+     * Create a new user account with email verification.
+     * 
+     * @bodyParam name string required The user's full name. Example: John Doe
+     * @bodyParam email string required The user's email address. Example: john@example.com
+     * @bodyParam password string required The user's password (min 8 characters). Example: password123
+     * @bodyParam password_confirmation string required Password confirmation. Example: password123
+     * @bodyParam country_code string optional The user's country code (MY or SG). Example: MY
+     * 
+     * @response 201 {
+     *   "message": "User registered successfully",
+     *   "user": {
+     *     "id": 1,
+     *     "name": "John Doe",
+     *     "email": "john@example.com",
+     *     "country_code": "MY",
+     *     "created_at": "2024-01-15T10:00:00.000000Z",
+     *     "updated_at": "2024-01-15T10:00:00.000000Z"
+     *   },
+     *   "access_token": "1|abcdef123456...",
+     *   "token_type": "Bearer"
+     * }
+     * 
+     * @response 422 {
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *     "email": ["The email has already been taken."]
+     *   }
+     * }
      */
     public function register(Request $request)
     {
@@ -42,6 +76,32 @@ class AuthController extends Controller
 
     /**
      * Login user
+     * 
+     * Authenticate user and return access token.
+     * 
+     * @bodyParam email string required The user's email address. Example: john@example.com
+     * @bodyParam password string required The user's password. Example: password123
+     * 
+     * @response 200 {
+     *   "message": "Login successful",
+     *   "user": {
+     *     "id": 1,
+     *     "name": "John Doe",
+     *     "email": "john@example.com",
+     *     "country_code": "MY",
+     *     "created_at": "2024-01-15T10:00:00.000000Z",
+     *     "updated_at": "2024-01-15T10:00:00.000000Z"
+     *   },
+     *   "access_token": "1|abcdef123456...",
+     *   "token_type": "Bearer"
+     * }
+     * 
+     * @response 422 {
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *     "email": ["The provided credentials are incorrect."]
+     *   }
+     * }
      */
     public function login(Request $request)
     {
@@ -70,6 +130,26 @@ class AuthController extends Controller
 
     /**
      * Get authenticated user
+     * 
+     * Retrieve the currently authenticated user information.
+     * 
+     * @authenticated
+     * 
+     * @response 200 {
+     *   "user": {
+     *     "id": 1,
+     *     "name": "John Doe",
+     *     "email": "john@example.com",
+     *     "country_code": "MY",
+     *     "is_admin": false,
+     *     "created_at": "2024-01-15T10:00:00.000000Z",
+     *     "updated_at": "2024-01-15T10:00:00.000000Z"
+     *   }
+     * }
+     * 
+     * @response 401 {
+     *   "message": "Unauthenticated."
+     * }
      */
     public function user(Request $request)
     {
@@ -80,6 +160,18 @@ class AuthController extends Controller
 
     /**
      * Logout user (Revoke current token)
+     * 
+     * Logout the user from current device by revoking the current access token.
+     * 
+     * @authenticated
+     * 
+     * @response 200 {
+     *   "message": "Logged out successfully"
+     * }
+     * 
+     * @response 401 {
+     *   "message": "Unauthenticated."
+     * }
      */
     public function logout(Request $request)
     {
@@ -92,6 +184,18 @@ class AuthController extends Controller
 
     /**
      * Logout from all devices (Revoke all tokens)
+     * 
+     * Logout the user from all devices by revoking all access tokens.
+     * 
+     * @authenticated
+     * 
+     * @response 200 {
+     *   "message": "Logged out from all devices successfully"
+     * }
+     * 
+     * @response 401 {
+     *   "message": "Unauthenticated."
+     * }
      */
     public function logoutAll(Request $request)
     {
@@ -104,6 +208,35 @@ class AuthController extends Controller
 
     /**
      * Update user's country preference
+     * 
+     * Update the authenticated user's country preference for pricing and currency.
+     * 
+     * @authenticated
+     * 
+     * @bodyParam country_code string required The country code (MY or SG). Example: SG
+     * 
+     * @response 200 {
+     *   "success": true,
+     *   "message": "Country preference updated successfully",
+     *   "data": {
+     *     "user": {
+     *       "id": 1,
+     *       "name": "John Doe",
+     *       "email": "john@example.com",
+     *       "country_code": "SG",
+     *       "created_at": "2024-01-15T10:00:00.000000Z",
+     *       "updated_at": "2024-01-15T10:00:00.000000Z"
+     *     },
+     *     "country_code": "SG"
+     *   }
+     * }
+     * 
+     * @response 422 {
+     *   "message": "The given data was invalid.",
+     *   "errors": {
+     *     "country_code": ["The selected country code is invalid."]
+     *   }
+     * }
      */
     public function updateCountry(Request $request)
     {
