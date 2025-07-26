@@ -68,7 +68,7 @@ A modern e-commerce API system built with Laravel 12 + Vue.js 3, featuring multi
 
 ### 1. Clone the Project
 ```bash
-git clone https://github.com/your-username/ecommerce-api.git
+git clone https://github.com/april-EXO/ecommerce-api.git
 cd ecommerce-api
 ```
 
