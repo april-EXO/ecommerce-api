@@ -177,9 +177,59 @@
             </div>
 
             <div class="mt-4">
+              <!-- Shipping Address Form -->
+              <div class="shipping-form mb-4">
+                <h5 class="mb-3">Shipping Address</h5>
+                
+                <div class="mb-3">
+                  <label for="shipping-name" class="form-label">Full Name *</label>
+                  <input 
+                    type="text" 
+                    class="form-control"
+                    id="shipping-name"
+                    v-model="shippingAddress.name"
+                    placeholder="Enter your full name"
+                    required
+                  >
+                  <div v-if="validationErrors.name" class="text-danger small mt-1">
+                    {{ validationErrors.name }}
+                  </div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="shipping-phone" class="form-label">Phone Number *</label>
+                  <input 
+                    type="tel" 
+                    class="form-control"
+                    id="shipping-phone"
+                    v-model="shippingAddress.phone"
+                    placeholder="Enter your phone number"
+                    required
+                  >
+                  <div v-if="validationErrors.phone" class="text-danger small mt-1">
+                    {{ validationErrors.phone }}
+                  </div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="shipping-address" class="form-label">Address *</label>
+                  <textarea 
+                    class="form-control"
+                    id="shipping-address"
+                    v-model="shippingAddress.address"
+                    rows="3"
+                    placeholder="Enter your full address"
+                    required
+                  ></textarea>
+                  <div v-if="validationErrors.address" class="text-danger small mt-1">
+                    {{ validationErrors.address }}
+                  </div>
+                </div>
+              </div>
+
               <button 
                 class="btn btn-primary btn-lg w-100 mb-2"
-                :disabled="!cartStore.cartItems.length || checkingOut"
+                :disabled="!cartStore.cartItems.length || checkingOut || !isShippingAddressValid"
                 @click="proceedToCheckout"
               >
                 <span v-if="checkingOut">
@@ -241,8 +291,21 @@ export default {
       clearing: false,
       checkingOut: false,
       showToast: false,
-      toastMessage: ''
+      toastMessage: '',
+      shippingAddress: {
+        name: '',
+        phone: '',
+        address: ''
+      },
+      validationErrors: {}
     };
+  },
+  computed: {
+    isShippingAddressValid() {
+      return this.shippingAddress.name.trim() && 
+             this.shippingAddress.phone.trim() && 
+             this.shippingAddress.address.trim();
+    }
   },
   async mounted() {
     // Initialize cart with current country
@@ -308,8 +371,29 @@ export default {
         this.checkingOut = true;
         
         try {
+          // Validate shipping address before sending
+          this.validationErrors = {};
+          if (!this.isShippingAddressValid) {
+            if (!this.shippingAddress.name.trim()) {
+              this.validationErrors.name = 'Name is required';
+            }
+            if (!this.shippingAddress.phone.trim()) {
+              this.validationErrors.phone = 'Phone number is required';
+            }
+            if (!this.shippingAddress.address.trim()) {
+              this.validationErrors.address = 'Address is required';
+            }
+            this.checkingOut = false;
+            return;
+          }
+
           const response = await this.$http.post('/api/orders', {
-            country: this.$globalCountry?.getCurrentCountry() || 'MY'
+            country: this.$globalCountry?.getCurrentCountry() || 'MY',
+            shipping_address: {
+              name: this.shippingAddress.name.trim(),
+              phone: this.shippingAddress.phone.trim(),
+              address: this.shippingAddress.address.trim()
+            }
           });
 
           if (response.data.success) {

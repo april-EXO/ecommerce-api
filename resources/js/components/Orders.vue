@@ -144,7 +144,7 @@
                     <button 
                       v-if="order.can_be_cancelled"
                       @click="cancelOrder(order)"
-                      class="btn btn-outline-danger btn-sm"
+                      class="btn btn-outline-danger btn-sm me-2"
                       :disabled="cancelling === order.id"
                     >
                       <span v-if="cancelling === order.id">
@@ -154,6 +154,22 @@
                       <span v-else>
                         <i class="fas fa-times me-1"></i>
                         Cancel
+                      </span>
+                    </button>
+                    
+                    <button 
+                      v-if="order.status === 'cancelled' || order.status === 'refunded'"
+                      @click="deleteOrder(order)"
+                      class="btn btn-outline-secondary btn-sm"
+                      :disabled="deleting === order.id"
+                    >
+                      <span v-if="deleting === order.id">
+                        <i class="fas fa-spinner fa-spin me-1"></i>
+                        Deleting...
+                      </span>
+                      <span v-else>
+                        <i class="fas fa-trash me-1"></i>
+                        Delete
                       </span>
                     </button>
                   </div>
@@ -238,6 +254,7 @@ export default {
       pagination: {},
       loading: false,
       cancelling: null,
+      deleting: null,
       filters: {
         status: ''
       },
@@ -387,6 +404,34 @@ export default {
       setTimeout(() => {
         this.showToast = false;
       }, 3000);
+    },
+
+    async deleteOrder(order) {
+      if (!confirm(`Are you sure you want to delete order ${order.order_number}? This action cannot be undone.`)) {
+        return;
+      }
+      
+      this.deleting = order.id;
+      
+      try {
+        const response = await this.$http.delete(`/api/orders/${order.id}`);
+        
+        if (response.data.success) {
+          this.showSuccess('Order deleted successfully');
+          // Remove the order from the list since user shouldn't see deleted orders
+          const orderIndex = this.orders.findIndex(o => o.id === order.id);
+          if (orderIndex !== -1) {
+            this.orders.splice(orderIndex, 1);
+          }
+        } else {
+          this.showError(response.data.message || 'Failed to delete order');
+        }
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        this.showError(error.response?.data?.message || 'Failed to delete order');
+      } finally {
+        this.deleting = null;
+      }
     },
 
     showError(message) {

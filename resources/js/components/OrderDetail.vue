@@ -86,7 +86,7 @@
                   <button 
                     v-if="order.can_be_cancelled"
                     @click="cancelOrder"
-                    class="btn btn-outline-danger w-100"
+                    class="btn btn-outline-danger w-100 mb-2"
                     :disabled="cancelling"
                   >
                     <span v-if="cancelling">
@@ -96,6 +96,22 @@
                     <span v-else>
                       <i class="fas fa-times me-1"></i>
                       Cancel Order
+                    </span>
+                  </button>
+                  
+                  <button 
+                    v-if="order.status === 'cancelled' || order.status === 'refunded'"
+                    @click="deleteOrder"
+                    class="btn btn-outline-secondary w-100 mb-2"
+                    :disabled="deleting"
+                  >
+                    <span v-if="deleting">
+                      <i class="fas fa-spinner fa-spin me-1"></i>
+                      Deleting...
+                    </span>
+                    <span v-else>
+                      <i class="fas fa-trash me-1"></i>
+                      Delete Order
                     </span>
                   </button>
                   
@@ -236,6 +252,7 @@ export default {
       loading: false,
       error: null,
       cancelling: false,
+      deleting: false,
       showToast: false,
       toastMessage: ''
     };
@@ -344,6 +361,33 @@ export default {
       setTimeout(() => {
         this.showToast = false;
       }, 3000);
+    },
+
+    async deleteOrder() {
+      if (!confirm(`Are you sure you want to delete order ${this.order.order_number}? This action cannot be undone.`)) {
+        return;
+      }
+      
+      this.deleting = true;
+      
+      try {
+        const response = await this.$http.delete(`/api/orders/${this.order.id}`);
+        
+        if (response.data.success) {
+          this.showSuccess('Order deleted successfully');
+          // Redirect to orders list after successful deletion
+          setTimeout(() => {
+            this.$router.push({ name: 'Orders' });
+          }, 1500);
+        } else {
+          this.showError(response.data.message || 'Failed to delete order');
+        }
+      } catch (error) {
+        console.error('Error deleting order:', error);
+        this.showError(error.response?.data?.message || 'Failed to delete order');
+      } finally {
+        this.deleting = false;
+      }
     },
 
     showError(message) {
