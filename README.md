@@ -188,6 +188,27 @@ Visit http://localhost:8000/docs to access the interactive API documentation whe
 - Test API calls with authentication
 - Download Postman collections
 
+## 🚀 **Postman API Testing**
+
+Test the API directly with our ready-to-use Postman collection.
+
+### 📱 **Access Postman Collection**
+
+🌐 **Join Team Workspace**: [Accept Invite & Open in Postman](https://app.getpostman.com/join-team?invite_code=7e7e2ac2e6b966463b875248441c66cc5ac441526b2cafbf5cdb51b035462372&target_code=0ee0a2dc75592fcd48ce94ca5669838e)
+
+**Features**:
+- ✅ All endpoints pre-configured
+- ✅ Sample request data included
+- ✅ Authentication examples
+- ✅ Ready to test with your local server
+
+**Quick Start**:
+1. Start your server: `php artisan serve`
+2. Open the Postman workspace
+3. Test the endpoints directly
+
+*Powered by [Scribe](https://scribe.knuckles.wtf/) - Auto-generated API documentation*
+
 ## 📱 Usage Guide
 
 ### 🔑 **Quick Test Accounts**
