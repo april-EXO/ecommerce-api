@@ -203,9 +203,9 @@ Test the API directly with our ready-to-use Postman collection.
 - ✅ Ready to test with your local server
 
 **Quick Start**:
-1. Start your server: `php artisan serve`
-2. Open the Postman workspace
-3. Test the endpoints directly
+1. Click the invite link above to join the team workspace
+2. Start your server: `php artisan serve`
+3. Test the endpoints directly in Postman
 
 *Powered by [Scribe](https://scribe.knuckles.wtf/) - Auto-generated API documentation*
 
