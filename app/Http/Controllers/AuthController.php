@@ -24,7 +24,6 @@ class AuthController extends Controller
      * @bodyParam name string required The user's full name. Example: John Doe
      * @bodyParam email string required The user's email address. Example: john@example.com
      * @bodyParam password string required The user's password (min 8 characters). Example: password123
-     * @bodyParam password_confirmation string required Password confirmation. Example: password123
      * @bodyParam country_code string optional The user's country code (MY or SG). Example: MY
      * 
      * @response 201 {
