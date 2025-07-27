@@ -400,6 +400,9 @@ npm run build
 - **Test Accounts**: Seeder creates test users automatically - remove or change passwords in production
 - **API Documentation**: Auto-generated with Scribe - regenerate after API changes
 
+
+<img width="1600" height="1106" alt="Untitled (1)" src="https://github.com/user-attachments/assets/26eab8c0-3ae5-4164-b2e6-d0ee4431fa83" />
+
 ## 🤝 Contributing
 
 1. Fork the project
@@ -416,7 +419,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 If you have issues:
 1. Check the troubleshooting section in this documentation
-2. Review existing [Issues](https://github.com/your-username/ecommerce-api/issues)
+2. Review existing [Issues](https://github.com/april-EXO/ecommerce-api/issues)
 3. Create a new Issue
 
 For API-related questions, refer to the interactive documentation at `/docs`.
